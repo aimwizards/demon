@@ -1,3 +1,3 @@
-# nexura
+# nexxuurra
 
-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/berlinmoneie/nexura)
+[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/berlinmoneie/nexxuurra)
