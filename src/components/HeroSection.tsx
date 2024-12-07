@@ -123,7 +123,7 @@ export default function HeroSection({ onSwapClick }: HeroSectionProps) {
         >
           <span className="relative">
             <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-              Nexura Token
+              Nexus Token
             </span>
             <motion.span
               className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-xl"
